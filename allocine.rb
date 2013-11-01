@@ -35,8 +35,6 @@ method = "showtimelist";
 params = "partner="+partner_key+"&lat="+lat+"&long="+long+"&format=json"
 
 # URL generation
-sha1 = OpenSSL::Digest::Digest.new('sha1')
-
 sig = CGI.escape(Digest::SHA1.base64digest(secret_key+params+'&sed='+sed));
 query_url = api_url+"/"+method+"?"+params+'&sed='+sed+'&sig='+sig;
 
@@ -56,7 +54,7 @@ movies.each do |f|
 #          print session.strftime("%Y-%m-%d %H:%M\n")
 #      end
 #      p tomorrow
-      if session > now && ((today and session < tomorrow) || !today)
+      if session > now && ((today && session < tomorrow) || !today)
         puts session.strftime("%Y-%m-%d %H:%M\n");
       end
     end
