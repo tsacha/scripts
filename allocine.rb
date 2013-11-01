@@ -50,10 +50,6 @@ movies.each do |f|
   f['scr'].each do |s|
     s['t'].each do |h|
       session = DateTime.parse("#{s['d']}+" "+#{h['$']}", "%Y-%m-%d %H:%M")
-#      if (session > now && !today) or (session < tomorrow)
-#          print session.strftime("%Y-%m-%d %H:%M\n")
-#      end
-#      p tomorrow
       if session > now && ((today && session < tomorrow) || !today)
         puts session.strftime("%Y-%m-%d %H:%M\n");
       end
