@@ -11,7 +11,7 @@ use Data::Dumper;
 use Getopt::Long;
 
 my $now = DateTime->now("time_zone" => "Europe/Paris");
-my $tomorrow = $now->add(days => 1);
+my $tomorrow = DateTime->now->add(days => 1);
 
 # Script options
 my $today = 0;
@@ -61,7 +61,7 @@ if ($response->is_success) {
 		    );
 		
  		my $session = $session_pattern->parse_datetime($s->{"d"}." ".$h->{"\$"});
-		if ($session <= $now && !$today || $session < $tomorrow) {
+		if ($session >$now && (($today && $session < $tomorrow) || !$today)) {
 		    print $session->strftime("%Y-%m-%d %H:%M\n");
 		}
 		
