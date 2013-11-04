@@ -61,7 +61,7 @@ if ($response->is_success) {
 		    );
 		
  		my $session = $session_pattern->parse_datetime($s->{"d"}." ".$h->{"\$"});
-		if ($session >$now && (($today && $session < $tomorrow) || !$today)) {
+		if ($session > $now && (($today && $session < $tomorrow) || !$today)) {
 		    print $session->strftime("%Y-%m-%d %H:%M\n");
 		}
 		
