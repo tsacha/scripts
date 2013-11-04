@@ -16,8 +16,6 @@ today = options.today
 
 now = datetime.now()
 tomorrow = now+timedelta(days=1)
-print(tomorrow)
-exit
 
 # AlloCine parameters
 api_url = 'api.allocine.fr'
