@@ -17,7 +17,7 @@ OptionParser.new do |opts|
 end.parse!
  
 now = DateTime.now
-tomorrow = (now.to_time+86400).to_date
+tomorrow = (now.to_time+86400).to_datetime
 
 # AlloCine parameters
 api_url = 'http://api.allocine.fr/rest/v3'
@@ -49,7 +49,7 @@ movies.each do |f|
   print title+"\n"
   f['scr'].each do |s|
     s['t'].each do |h|
-      session = DateTime.parse("#{s['d']}+" "+#{h['$']}", "%Y-%m-%d %H:%M")
+      session = DateTime.parse("#{s['d']} #{h['$']}", "%Y-%m-%d %H:%M")
       if session > now && ((today && session < tomorrow) || !today)
         puts session.strftime("%Y-%m-%d %H:%M\n");
       end
