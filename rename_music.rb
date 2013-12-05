@@ -17,6 +17,11 @@ optparse = OptionParser.new do |opts|
     options[:try] = noop
   end
 
+  options[:verbose] = false
+  opts.on("-v", "--verbose", "Verbose output") do |verbose|
+    options[:verbose] = verbose
+  end
+
   opts.on("-f", "--folder FOLDER", String, "Folder where operate") do |folder|
     options[:folder] = folder
   end
@@ -42,25 +47,50 @@ Dir.glob("**/*").each do |file|
         tags = {}
         flac.each_line do |tag|
           type = tag.split("=")
-          tags[type.shift] = type.join("=")[0..-2]
+          tags[type.shift.downcase] = type.join("=")[0..-2]
         end
 
+        
+        if tags["artist"].nil?
+          raise "#{File.absolute_path(file)} has not an artist tag"
+        end
+
+        if tags["album"].nil?
+          raise "#{File.absolute_path(file)} has not an album tag"
+        end
+
+        if tags["date"].nil?
+          raise "#{File.absolute_path(file)} has not a date tag"
+        end
+
+        if tags["tracknumber"].nil?
+          raise "#{File.absolute_path(file)} has not a tracknumber tag"
+        end
+
+        if tags["title"].nil?
+          raise "#{File.absolute_path(file)} has not a title tag"
+        end
+        
         tags["tracknumber"] = tags["tracknumber"].gsub(/^([0-9])$/,'0\1')
         tags["title"] = tags["title"].gsub(/\//,'\\')
+        tags["date"] = tags["date"].split("-")[0]
+        tags["discnumber"] = "1" if tags["discnumber"].nil?
+
         target_dir = options[:music_folder]+"/"+tags["artist"]+"/"+tags["date"]+" - "+tags["album"]+"/Disc "+tags["discnumber"]
         target_file = tags["tracknumber"]+" - "+tags["title"]+".flac"
+
         if not File.exists? target_dir and not File.directory? target_dir
           if not options[:try]
             FileUtils.mkdir_p target_dir
           end
-          puts "\e\[34mmkdir -p #{target_dir}\e[0m"
+          puts "\e\[34mmkdir -p #{target_dir}\e[0m" if options[:verbose]
         end
         
         if not File.exists? target_dir+"/"+target_file
           if not options[:try]
             File.rename file,target_dir+"/"+target_file
           end
-          puts "\e\[32mmv #{file} #{target_dir}/#{target_file}\e[0m"
+          puts "\e\[32mmv #{file} #{target_dir}/#{target_file}\e[0m" if options[:verbose]
         end
       rescue Exception => msg
         puts "\e\[31m#{msg}\e[0m"
