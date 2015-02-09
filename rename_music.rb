@@ -43,9 +43,9 @@ def rename(options,file,tags)
   
   if not File.exists? target_dir+"/"+target_file
     if not options[:try]
-      File.rename file,target_dir+"/"+target_file
+      `git mv #{Shellwords.escape(file)} #{Shellwords.escape(target_dir)}/#{Shellwords.escape(target_file)}`
     end
-    puts "\e\[32mmv #{file} #{target_dir}/#{target_file}\e[0m" if options[:verbose]
+    puts "\e\[32mgit mv #{Shellwords.escape(file)} #{Shellwords.escape(target_dir)}/#{Shellwords.escape(target_file)}\e[0m" if options[:verbose]
   end
 end
 
@@ -110,10 +110,12 @@ begin
         end
         rename(options,file,tags)
       else
-        if not options[:try]
-          File.delete(file)
+        if file[-5..-1] != "README" then
+          if not options[:try]
+            File.delete(file)
+          end
+          puts "\e\[31mrm #{file}\e[0m" if options[:verbose]
         end
-        puts "\e\[31mrm #{file}\e[0m" if options[:verbose]
       end
     end
   end
