@@ -43,9 +43,9 @@ def rename(options,file,tags)
   
   if not File.exists? target_dir+"/"+target_file
     if not options[:try]
-      `git mv #{Shellwords.escape(file)} #{Shellwords.escape(target_dir)}/#{Shellwords.escape(target_file)}`
+      File.rename file,target_dir+"/"+target_file
     end
-    puts "\e\[32mgit mv #{Shellwords.escape(file)} #{Shellwords.escape(target_dir)}/#{Shellwords.escape(target_file)}\e[0m" if options[:verbose]
+    puts "\e\[32mmv #{file} #{target_dir}/#{target_file}\e[0m" if options[:verbose]
   end
 end
 
@@ -84,15 +84,13 @@ begin
       ext = file.split('.')[-1]
       if ext == "mp3"
         tags = {}
-
-        mp3 = `eyeD3 --no-color #{Shellwords.escape(file)} 2> /dev/null`
+        mp3 = `eyeD3 --rfc822 --no-color #{Shellwords.escape(file)} 2> /dev/null`
         raise "#{Shellwords.escape(file)} is not a correct file" if $? != 0
-
         mp3.each_line do |tag|
-          data = tag.scan /^([a-z ]+): (.*?)\t*$/
+          data = tag.scan /^([A-z ]+): (.*)/
+          key = data[0][0].downcase if not data[0].nil?
           if not data.empty?
-            key = data[0][0]
-            if key == "recording date" then tags["date"] = data[0][1]
+            if key == "year" then tags["date"] = data[0][1]
             elsif key == "track" then tags["tracknumber"] = data[0][1]
             else tags[key] = data[0][1]
             end
@@ -110,12 +108,10 @@ begin
         end
         rename(options,file,tags)
       else
-        if file[-5..-1] != "README" then
-          if not options[:try]
-            File.delete(file)
-          end
-          puts "\e\[31mrm #{file}\e[0m" if options[:verbose]
+        if not options[:try]
+          File.delete(file)
         end
+        puts "\e\[31mrm #{file}\e[0m" if options[:verbose]
       end
     end
   end
